@@ -3,7 +3,7 @@
 ## Overview
 Dungeon Generation Service is a service that uses a simple head-on algorithim I created to semi-procedurally generate dungeon rooms. This generation relies on having chunks within the ServerStorage, which are then randomly inserted into the game to semi-procedurally generate the dungeon. There are 5 categories of chunks: Start, Front, Right Corners, Left Corners, and End. Each chunk has its own set of random layouts that is used when called by the service, giving the dungeon a sense of *procedural generation*. This service also has built in error checks, to make sure the dungeon layout doesn't *loop* into itself. 
 
-Again, due to this simplicity of it, the dungeon layout itself only goes *forward*, (Based on the start chunk) which can lead to more possibilities to update this service in the future. *(Can send RBXL file upon request)*
+Again, due to this simplicity of it, the dungeon layout itself only goes *forward*, (Based on the start CFrame) which can lead to more possibilities to update this service in the future. *(Can send RBXL file upon request)*
 
 ## Basic Usage
 ```
