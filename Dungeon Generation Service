@@ -173,6 +173,7 @@ function DungeonGenerationService:KnitInit()
 end
 
 function DungeonGenerationService:KnitStart()
+	-->>: When knit starts, automatically generates dungeon layout
 	DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240)) -->>: Number of Rooms, Room Chunks, Floor Size, Start CFrame
 end
 
