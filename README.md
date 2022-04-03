@@ -6,7 +6,7 @@ Dungeon Generation Service is a service that uses a simple algorithm I created t
 Again, due to this simplicity of it, the dungeon layout itself only goes *forward*, (Based on the start CFrame) which can lead to more possibilities to update this service in the future.
 
 ## Knit Framework
-This service was used in conjunction with the Knit Framework developed by sleitnick. Overall, the Knit Framework has really helped organize my code base with the capability of remote-less server-client communications. It also has built-in services and controllers creation, which really helps when developing core game logic. 
+The Knit Framework has really helped organize my code base with the capability of remote-less server-client communications. It also has built-in services and controllers creation, which really helps when developing core game logic. (This service was used in conjunction with the Knit Framework, but is not needed for it to work.)
 
 ## Basic Usage
 ```
