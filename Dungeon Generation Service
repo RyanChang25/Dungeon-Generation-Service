@@ -1,0 +1,208 @@
+-->>: Note: The code here was used in conjunction with the Knit Framework. The service still works without Knit, so if you aren't familier with the framework don't worry!
+
+local CollectionService = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local GameDictionary = require(game.ReplicatedStorage.Shared.GameDictionary)
+local cloneCompleted = true
+local iterationNum = 0
+local LeftCornerCount = 0
+local RightCornerCount = 0
+local NumberofRooms
+local movingCFrameVal
+local currentPart
+
+local RoomTable = {}
+
+local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local DungeonGenerationService = Knit.CreateService {
+	Name = "DungeonGenerationService";
+	Client = {};
+}
+
+local function GetRandomFront()
+	return game.ServerStorage.DungeonParts:FindFirstChild("Front"..Random.new():NextInteger(1,9))
+end
+
+local function GetRandomCorner(direction)
+	return game.ServerStorage.DungeonParts:FindFirstChild(direction.."Corner"..Random.new():NextInteger(1,3))
+end
+
+local function clonePart(part, position, reName)
+	cloneCompleted = false
+	iterationNum = iterationNum + 1
+	if iterationNum == NumberofRooms then
+		
+		local partName = "Finalboss-Room"
+		local newModel = Instance.new('Model', workspace.TargetFilter.Map.DungeonRooms)
+		newModel.Name = partName
+		for i,v in pairs ( game.ServerStorage.DungeonParts.FinalbossPart:GetChildren()) do
+			v:Clone().Parent = newModel
+		end
+		newModel.PrimaryPart = newModel:FindFirstChild("Floor")
+		if string.sub(currentPart.Name, 1, 5) == "Front" then -- works
+			newModel:SetPrimaryPartCFrame(currentPart:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal*1))
+		elseif string.sub(currentPart.Name, 1, 10) == "LeftCorner" then -- works
+			newModel:SetPrimaryPartCFrame(currentPart:GetPrimaryPartCFrame() * CFrame.new(0, 0, movingCFrameVal*1) * CFrame.fromEulerAnglesXYZ(0,math.rad(180),0))
+		elseif string.sub(currentPart.Name, 1, 11) == "RightCorner" then -- works
+			newModel:SetPrimaryPartCFrame(currentPart:GetPrimaryPartCFrame() * CFrame.new(-movingCFrameVal*1, 0, 0) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
+		end
+		currentPart = newModel
+		newModel.Floor.Parent = workspace.FloorFilter
+		--print (iterationNum..": "..newModel.Name.." has been cloned!")
+	else
+		local partName = part.Name
+		local newModel = Instance.new('Model', workspace.TargetFilter.Map.DungeonRooms)
+		newModel.Name = partName
+		for i,v in pairs (part:GetChildren()) do
+			v:Clone().Parent = newModel
+		end
+		if reName ~= nil then
+			newModel.Name = reName
+			part.Name = reName
+		end
+		currentPart = newModel
+		newModel.PrimaryPart = newModel:FindFirstChild("Floor")
+		if position ~= nil then
+			newModel:SetPrimaryPartCFrame(position)
+		end
+		table.insert(RoomTable, newModel)
+		CollectionService:AddTag(newModel, "Obstacle")
+		--print (iterationNum..": "..newModel.Name.." has been cloned!")
+	end
+	cloneCompleted = true
+end
+
+local function CornerGenerate(part)
+	if LeftCornerCount ~= 2 and RightCornerCount ~= 2 then
+		local CornerChance = math.random(1,2)
+		if CornerChance == 1 then
+			LeftCornerCount += 1
+			clonePart(GetRandomCorner("Left"), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
+		elseif CornerChance == 2 then
+			RightCornerCount += 1
+			clonePart(GetRandomCorner("Right"), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(0),0))
+		end
+	else
+		if LeftCornerCount ~= 2 then
+			LeftCornerCount += 1
+			if RightCornerCount > 0 then
+				RightCornerCount -= 1
+			end
+			clonePart(GetRandomCorner("Left"), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
+		elseif RightCornerCount ~= 2 then
+			RightCornerCount += 1
+			if LeftCornerCount > 0 then
+				LeftCornerCount -= 1
+			end
+			clonePart(GetRandomCorner("Right"), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(0),0))
+		end
+	end	
+end
+
+local function checkProceduralPart(part)
+	local FrontChance = math.random(1,3)
+	if string.sub(part.Name, 1, 5) == "Front" or string.sub(part.Name, 1,3) == "End" then
+		if FrontChance == 1 then
+			clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal))
+		elseif FrontChance >= 2 then
+			CornerGenerate(part)
+		end
+	elseif string.sub(part.Name, 1, 4) == "Left" then
+		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(180),0))
+	elseif string.sub(part.Name, 1, 5) == "Right" then
+		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(-movingCFrameVal, 0, 0) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
+	elseif string.sub(part.Name, 1,2) == "Mini" then
+		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal*2))
+	end
+end
+
+function DungeonGenerationService:Generate(rooms, roomSize, floorSize, cFrame)
+	
+	local StartPiece = Random.new():NextInteger(1,3)
+	
+	local StartRoom = game.ServerStorage.DungeonParts.StartRoom:Clone()
+	StartRoom.Parent = workspace.TargetFilter.Map.StarterRoom
+	StartRoom:SetPrimaryPartCFrame(CFrame.new(cFrame) * CFrame.Angles(0, math.rad(math.random(0,180)), 0))
+	
+	NumberofRooms = rooms
+	movingCFrameVal = floorSize
+	
+	local startCFrame = StartRoom.StartCFrame.CFrame
+	
+	if StartPiece == 1 then
+		clonePart(GetRandomFront(), startCFrame) -->>: Always starts with a front part
+	elseif StartPiece == 2 then
+		LeftCornerCount += 1
+		clonePart(GetRandomCorner("Left"), startCFrame * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0)) -->>: Always starts with a front part
+	elseif StartPiece == 3 then
+		RightCornerCount += 1
+		clonePart(GetRandomCorner("Right"), startCFrame * CFrame.fromEulerAnglesXYZ(0,math.rad(0),0)) -->>: Always starts with a front part
+	end
+
+	for i = 1, NumberofRooms, 1 do -->>: Generates the rooms
+		repeat wait() until cloneCompleted
+		checkProceduralPart(currentPart)
+	end
+
+	local nextMultiple = roomSize
+	local RoomNumber = 1
+
+	for i,v in pairs (RoomTable) do -->>: Adds the EndParts to the rooms
+		if i % nextMultiple == 0 then
+			local RoomFolder = Instance.new("Folder", workspace.TargetFilter.Map.DungeonRooms)
+			RoomFolder.Name = "Room-"..tostring(RoomNumber)
+			local partName = "End-"..tostring(RoomNumber)
+			local newModel = Instance.new('Model', workspace.TargetFilter.Map.DungeonRooms)
+			newModel.Name = partName
+			for i,v in pairs (game.ServerStorage.DungeonParts.DungeonEnd:GetChildren()) do
+				v:Clone().Parent = newModel
+			end
+			currentPart = newModel
+			newModel.PrimaryPart = newModel:FindFirstChild("Floor")
+			if string.sub(v.Name, 1, 5) == "Front" then -- works
+				newModel:SetPrimaryPartCFrame(RoomTable[i]:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal))
+			elseif string.sub(v.Name, 1, 10) == "LeftCorner" then -- works
+				newModel:SetPrimaryPartCFrame(RoomTable[i]:GetPrimaryPartCFrame() * CFrame.new(0, 0, movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(180),0))
+			elseif string.sub(v.Name, 1, 11) == "RightCorner" then -- works
+				newModel:SetPrimaryPartCFrame(RoomTable[i]:GetPrimaryPartCFrame() * CFrame.new(-movingCFrameVal, 0, 0) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
+			end
+			CollectionService:AddTag(newModel, "Obstacle")
+			RoomNumber += 1
+		end
+	end
+	
+	local tempRoomNumber = 1
+	for iRoom,v in pairs (RoomTable) do -->>: Puts rooms into correct folders
+		v.Floor.Parent = workspace.FloorFilter
+		if iRoom % nextMultiple == 0 then
+			for i = (nextMultiple-1), 0, -1 do
+				RoomTable[iRoom - i].Parent = workspace.TargetFilter.Map.DungeonRooms:FindFirstChild("Room-"..tostring(tempRoomNumber))
+			end
+			tempRoomNumber += 1
+		end
+	end
+	
+	for i = 1, (RoomNumber-1), 1 do
+		for i,model in pairs (workspace.TargetFilter.Map.DungeonRooms:FindFirstChild("Room-"..tostring(i)):GetChildren()) do
+			if model:IsA("Model") then
+				for i,v in pairs (model:GetChildren()) do
+					if v.Name == "MobSpawn" then
+						v.Transparency = 1
+					end
+				end
+			end
+		end
+	end
+	
+end
+
+function DungeonGenerationService:KnitInit()
+end
+
+function DungeonGenerationService:KnitStart()
+	DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240)) -->>: Number of Rooms, Room Chunks, Floor Size, Start CFrame
+end
+
+return DungeonGenerationService
