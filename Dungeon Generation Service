@@ -1,4 +1,4 @@
--->>: Note: The code here was used in conjunction with the Knit Framework. The service still works without Knit, so if you aren't familier with the framework don't worry!
+-->>: Note: The code here was used in conjunction with the Knit Framework. The service still works without Knit, so if you aren't familier with the framework don't worry it is not required!
 
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
