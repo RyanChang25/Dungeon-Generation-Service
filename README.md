@@ -5,6 +5,9 @@ Dungeon Generation Service is a service that uses a simple algorithm I created t
 
 Again, due to this simplicity of it, the dungeon layout itself only goes *forward*, (Based on the start CFrame) which can lead to more possibilities to update this service in the future.
 
+## Knit Framework
+This service was used in conjunction with the Knit Framework developed by sleitnick. Overall, the Knit Framework has really helped organize my code base with the capability of remote-less server-client communications. It also has built-in services and controllers creation, which really helps when developing core game logic. 
+
 ## Basic Usage
 ```
 -- Note: This will not work if you do not have the correct Folder Structure and naming conventions! If interested in the actual implementation, feel free to ask me!
@@ -14,3 +17,5 @@ DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240)) -->>: Nu
 
 ## Important Links
 **(Used in my Fall Accelerator) Demo - https://www.roblox.com/games/9127181027/Accelerator-Game-Concept**
+
+**Knit Framework - https://sleitnick.github.io/Knit/**
