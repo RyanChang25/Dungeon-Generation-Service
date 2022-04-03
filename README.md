@@ -16,6 +16,8 @@ DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240)) -->>: Nu
 ```
 
 ## Important Links
+**Video Showcase - https://www.youtube.com/watch?v=GUbLMR5cBiY&t=17s**
+
 **(Used in my Fall Accelerator) Demo - https://www.roblox.com/games/9127181027/Accelerator-Game-Concept**
 
 **Knit Framework - https://sleitnick.github.io/Knit/**
