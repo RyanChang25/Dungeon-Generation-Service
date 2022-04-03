@@ -95,19 +95,18 @@ local function CornerGenerate(part)
 end
 
 local function checkProceduralPart(part)
-	local FrontChance = math.random(1,3)
+	-->>: String.sub checks to see what type of chunk to generate
 	if string.sub(part.Name, 1, 5) == "Front" or string.sub(part.Name, 1,3) == "End" then
+		local FrontChance = math.random(1,3) -->>: Randomly generates a front chunk, or a right/left corner chunk
 		if FrontChance == 1 then
 			clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal))
-		elseif FrontChance >= 2 then
+		else
 			CornerGenerate(part)
 		end
-	elseif string.sub(part.Name, 1, 4) == "Left" then
+	elseif string.sub(part.Name, 1, 4) == "Left" then -->>: Left Corner Chunk
 		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, movingCFrameVal) * CFrame.fromEulerAnglesXYZ(0,math.rad(180),0))
-	elseif string.sub(part.Name, 1, 5) == "Right" then
+	elseif string.sub(part.Name, 1, 5) == "Right" then -->>: Right Corner Chunk
 		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(-movingCFrameVal, 0, 0) * CFrame.fromEulerAnglesXYZ(0,math.rad(90),0))
-	elseif string.sub(part.Name, 1,2) == "Mini" then
-		clonePart(GetRandomFront(), part:GetPrimaryPartCFrame() * CFrame.new(0, 0, -movingCFrameVal*2))
 	end
 end
 
