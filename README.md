@@ -10,8 +10,7 @@ The Knit Framework has really helped organize my code base with the capability o
 
 ## Basic Usage
 ```
-DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240))
--->>: Number of Rooms, Room Chunks, Floor Size, Start CFrame
+DungeonGenerationService:Generate(10, 3, 60, Vector3.new(90, -1, -240)) -->>: # of Rooms, Chunk Size, Floor Size, Start Pos
 -- Yep that's it! Just call one function to generate the dungeon!
 -- Note: This will not work if you do not have the correct Folder Structure and naming conventions! If interested in the actual implementation, feel free to ask me!
 ```
